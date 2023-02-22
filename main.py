@@ -47,6 +47,9 @@ else:
         if line.strip() != "":
             emails.append(line.strip())
     emails_file.close()
+    if len(emails) == 0:
+        print("邮箱列表为空")
+        exit()
 
 print(f"共读取到{len(emails)}个邮箱")
 html_file_name = input("请输入邮件内容html文件名，无需后缀\n")
@@ -60,4 +63,5 @@ else:
     html_file.close()
 
 title = input("请输入邮件标题\n")
-send_mails(emails, title, html)
+for i in range(0,len(emails)//50+1):
+    send_mails(emails[i*50:(i+1)*50], title, html)
