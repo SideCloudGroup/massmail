@@ -63,5 +63,5 @@ else:
     html_file.close()
 
 title = input("请输入邮件标题\n")
-for i in range(0,len(emails)//50+1):
-    send_mails(emails[i*50:(i+1)*50], title, html)
+for address in emails:
+    send_mails([address], title, html)
