@@ -11,8 +11,8 @@ from_email = ""  # 发件人邮箱
 def send_mails(to, subject, content):
     global server, key, from_name, from_email
     data = {
-        "from": from_email,
-        "sender": from_name,
+        "from": f"{from_name} <{from_email}>",
+        "sender": from_email,
         "to": to,
         "subject": subject,
         "html_body": content
@@ -63,5 +63,7 @@ else:
     html_file.close()
 
 title = input("请输入邮件标题\n")
+if input("确认发送？(y/n)") != "y":
+    exit()
 for address in emails:
     send_mails([address], title, html)
