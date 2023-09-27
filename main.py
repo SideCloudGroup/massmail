@@ -54,7 +54,7 @@ else:
 print(f"共读取到{len(emails)}个邮箱")
 html_file_name = input("请输入邮件内容html文件名，无需后缀\n")
 try:
-    html_file = open(html_file_name + ".html", "r")
+    html_file = open(html_file_name + ".html", "r", encoding="utf-8")
 except FileNotFoundError:
     print("读取邮件内容失败")
     exit()
