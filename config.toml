@@ -1,0 +1,19 @@
+[postal]
+# Postal面板地址，结尾不需要斜杠
+server = ""
+# Postal API Credential
+key = ""
+# 发件人名称
+from_name = ""
+# 发件人邮箱地址
+from_email = ""
+
+[setting]
+# 邮箱地址列表文件
+email_list = "emails.txt"
+# 邮件主题
+subject = "This is the subject"
+# 邮件内容文件
+email_content = "email.html"
+# 发信速度（每分钟N封），设为0表示不延迟
+limit = 0
