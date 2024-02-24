@@ -2,11 +2,11 @@ import json
 import time
 
 import toml
-from requests import post
+from requests import session
 from tqdm import tqdm
 
 
-def send_mails(to, subject, content):
+def send_mails(to, subject, content, session):
     data = {
         "from": f"{from_name} <{from_email}>",
         "sender": from_email,
@@ -16,8 +16,8 @@ def send_mails(to, subject, content):
     }
     # 转换成json格式
     data = json.dumps(data)
-    result = post(server + "/api/v1/send/message", data=data,
-                  headers={"X-Server-API-Key": key, "content-type": "application/json"})
+    result = session.post(server + "/api/v1/send/message", data=data,
+                          headers={"X-Server-API-Key": key, "content-type": "application/json"})
     if result.status_code == 200:
         result_json = json.loads(result.text)
         if result_json["status"] != "success":
@@ -73,8 +73,9 @@ if __name__ == "__main__":
     # 计算延迟
     delay = (60 / config["setting"]["limit"]) if config["setting"]["limit"] != 0 else 0
     total_emails = len(emails)
+    session = session()
     print(f"延迟{delay}秒发送，共{total_emails}封邮件")
     for i, address in enumerate(tqdm(emails, desc="发送邮件进度"), start=1):
-        send_mails([address], config["setting"]["subject"], html)
+        send_mails([address], config["setting"]["subject"], html, session)
         if i != total_emails:
             time.sleep(delay)
