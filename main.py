@@ -1,12 +1,22 @@
 import json
 import time
-
-import toml
-from requests import session
+import requests
+from requests.adapters import HTTPAdapter
 from tqdm import tqdm
+import toml
+from urllib3 import Retry
 
 
-def send_mails(to, subject, content, session):
+def init_session(proxy):
+    s = requests.Session()
+    retries = Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+    s.mount('http://', HTTPAdapter(max_retries=retries))
+    s.mount('https://', HTTPAdapter(max_retries=retries))
+    s.proxies = {} if proxy == "" else {"http": proxy, "https": proxy}
+    return s
+
+
+def send_mails(session, server, key, from_name, from_email, to, subject, content):
     data = {
         "from": f"{from_name} <{from_email}>",
         "sender": from_email,
@@ -14,7 +24,6 @@ def send_mails(to, subject, content, session):
         "subject": subject,
         "html_body": content
     }
-    # 转换成json格式
     data = json.dumps(data)
     result = session.post(server + "/api/v1/send/message", data=data,
                           headers={"X-Server-API-Key": key, "content-type": "application/json"})
@@ -44,7 +53,6 @@ if __name__ == "__main__":
     if server == "" or key == "" or from_name == "" or from_email == "":
         print("请先修改配置文件config.toml")
         exit()
-    # 读取邮件列表到数组
     emails = []
     try:
         emails_file = open(config['setting']['email_list'], "r")
@@ -68,14 +76,17 @@ if __name__ == "__main__":
     else:
         html = html_file.read()
         html_file.close()
+    session = init_session(config["setting"]["proxy"])
     if input("确认发送？(y/n)") != "y":
         exit()
-    # 计算延迟
     delay = (60 / config["setting"]["limit"]) if config["setting"]["limit"] != 0 else 0
     total_emails = len(emails)
-    session = session()
     print(f"延迟{delay}秒发送，共{total_emails}封邮件")
     for i, address in enumerate(tqdm(emails, desc="发送邮件进度"), start=1):
-        send_mails([address], config["setting"]["subject"], html, session)
+        try:
+            send_mails(session, server, key, from_name, from_email, [address], config["setting"]["subject"], html)
+        except Exception as e:
+            print(f"发件失败，错误信息：{e}")
+            session = init_session(config["setting"]["proxy"])
         if i != total_emails:
             time.sleep(delay)

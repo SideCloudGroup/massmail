@@ -17,3 +17,5 @@ subject = "This is the subject"
 email_content = "email.html"
 # 发信速度（每分钟N封），设为0表示不延迟
 limit = 0
+# 代理设置，格式为http://ip:port，留空表示不使用代理
+proxy = ""
