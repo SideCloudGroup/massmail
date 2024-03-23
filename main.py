@@ -55,7 +55,7 @@ if __name__ == "__main__":
         exit()
     emails = []
     try:
-        emails_file = open(config['setting']['email_list'], "r")
+        emails_file = open(config['setting']['email_list'], "r", encoding="utf-8")
     except FileNotFoundError:
         print("读取邮箱列表失败")
         exit()
